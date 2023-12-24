@@ -7,7 +7,7 @@ include Cheet::Markdown
 describe MarkdownDocument do
   describe "#content" do
     it "retrieves the content under a heading" do
-      d = MarkdownDocument.new("spec/lorem.md")
+      d = MarkdownDocument.new("spec/files/lorem.md")
       content = d.content(2).gets_to_end
       content.strip.should eq <<-END
       Phasellus enim erat, vestibulum vel, aliquam a, posuere eu, velit:
