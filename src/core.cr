@@ -70,4 +70,50 @@ module Cheet
       to_s io
     end
   end
+
+  def self.each_child_recursive(dirname : Dir | Path | String)
+    parents = Deque({Iterator(String), Path}).new
+    case dirname
+    in Dir
+      topdir = dirname
+      toppath = Path[dirname]
+    in Path
+      topdir = Dir.new(dirname)
+      toppath = dirname
+    in String
+      topdir = Dir.new(dirname)
+      toppath = Path[dirname]
+    end
+    parents.push({topdir.each_child, toppath})
+    until parents.empty?
+      iter, parent_path = parents.last
+      elem = iter.next
+      if elem.is_a? Iterator::Stop
+        parents.pop
+        next
+      end
+      path = parent_path / elem
+      if File.directory? path
+        parents.push({Dir.new(path).each_child, path})
+        yield path
+      elsif File.file? path
+        yield path
+      end
+    end
+  end
+
+  def self.each_child_recursive(dirs : Array)
+    dirs.each do |dir|
+      dir = dir.path if dir.is_a? Dir
+      each_child_recursive(dir) do |path|
+        yield path
+      end
+    end
+  end
+
+  def self.each_file_recursive(dirname : Dir | Path | String)
+    each_child_recursive(dirname) do |child|
+      yield child if File.file? child
+    end
+  end
 end
