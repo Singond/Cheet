@@ -116,8 +116,9 @@ module Cheet
 
   # Yields every regular file inside *dir* and any subdirectories
   # to the block.
-  def self.each_file_recursive(dirname : Dir | Path | String)
-    each_child_recursive(dirname) do |child|
+  # The argument can also be an array of directories.
+  def self.each_file_recursive(dir)
+    each_child_recursive(dir) do |child|
       yield child if File.file? child
     end
   end

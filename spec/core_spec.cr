@@ -50,6 +50,20 @@ describe Cheet do
       paths.should_not contain "src/core.cr"
       paths.should_not contain "src/markdown.cr"
     end
+
+    it "accepts array argument" do
+      paths = [] of String
+      Cheet.each_file_recursive ["spec", "src"] do |path|
+        paths << path.to_s
+      end
+
+      paths.should_not contain "spec/files"
+      paths.should contain "spec/files/lorem.md"
+      paths.should contain "spec/core_spec.cr"
+      paths.should contain "spec/markdown_spec.cr"
+      paths.should contain "src/core.cr"
+      paths.should contain "src/markdown.cr"
+    end
   end
 
 end
