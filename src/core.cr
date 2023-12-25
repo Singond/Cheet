@@ -71,6 +71,7 @@ module Cheet
     end
   end
 
+  # Yields every path inside *dirname* and any subdirectories to the block.
   def self.each_child_recursive(dirname : Dir | Path | String)
     parents = Deque({Iterator(String), Path}).new
     case dirname
@@ -102,6 +103,8 @@ module Cheet
     end
   end
 
+  # Yields every path inside any directory in *dirs*
+  # and any of its subdirectories to the block.
   def self.each_child_recursive(dirs : Array)
     dirs.each do |dir|
       dir = dir.path if dir.is_a? Dir
@@ -111,6 +114,8 @@ module Cheet
     end
   end
 
+  # Yields every regular file inside *dir* and any subdirectories
+  # to the block.
   def self.each_file_recursive(dirname : Dir | Path | String)
     each_child_recursive(dirname) do |child|
       yield child if File.file? child
