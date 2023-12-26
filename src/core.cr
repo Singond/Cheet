@@ -1,5 +1,7 @@
 module Cheet
 
+  alias Topic = String
+
   abstract class Document
     @file : File
     @index : Index?
@@ -31,6 +33,17 @@ module Cheet
       else
         # Read to end
         @file
+      end
+    end
+
+    # Returns the content of the heading for which the given block
+    # is truthy.
+    def content? : IO?
+      heading_index = index.headings.index do |heading|
+        yield heading
+      end
+      heading_index.try do |idx|
+        content?(idx)
       end
     end
   end
