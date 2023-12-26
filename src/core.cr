@@ -19,14 +19,17 @@ module Cheet
       idx.not_nil!
     end
 
-    def content(heading : Int32) : IO
+    # Returns the content of the heading given by its index.
+    def content?(heading : Int32) : IO?
       start_heading = index.headings[heading]
-      return IO::Memory.new unless start_heading
+      return nil unless start_heading
       next_heading = index.next_at_level(heading, start_heading.level)
       skip_to_content(start_heading)
       if next_heading
+        # Read only to `next_heading`
         IO::Sized.new(@file, read_size: next_heading.offset - @file.pos)
       else
+        # Read to end
         @file
       end
     end

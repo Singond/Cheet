@@ -5,10 +5,14 @@ include Cheet
 include Cheet::Markdown
 
 describe MarkdownDocument do
-  describe "#content" do
+  describe "#content?" do
     it "retrieves the content under a heading" do
       d = MarkdownDocument.new("spec/files/lorem.md")
-      content = d.content(2).gets_to_end
+      content = d.content?(2).try &.gets_to_end
+
+      content.should_not be_nil
+      content = content.not_nil!
+
       content.strip.should eq <<-END
       Phasellus enim erat, vestibulum vel, aliquam a, posuere eu, velit:
           - Ut enim ad minim veniam,
