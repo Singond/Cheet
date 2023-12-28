@@ -123,6 +123,7 @@ module Cheet
   # and any of its subdirectories to the block.
   def self.each_child_recursive(dirs : Array)
     dirs.each do |dir|
+      next unless dir.is_a? Dir || File.directory? dir
       each_child_recursive(dir) do |path|
         yield path
       end
