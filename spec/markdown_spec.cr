@@ -6,7 +6,7 @@ include Cheet::Markdown
 
 describe MarkdownDocument do
   describe "#content?(Int32)" do
-    it "retrieves the content under a heading" do
+    it "retrieves the content including subsections" do
       d = MarkdownDocument.new("spec/files/lorem.md")
       content = d.content?(2).try &.gets_to_end
 
@@ -21,6 +21,20 @@ describe MarkdownDocument do
           - ut aliquip ex ea commodo consequat.
 
       ### Cras elementum
+      Mauris dolor felis, sagittis at, luctus sed, aliquam non, tellus.
+      Integer rutrum, orci vestibulum ullamcorper ultricies, lacus quam
+      ultricies odio, vitae placerat pede sem sit amet enim.
+      END
+    end
+
+    it "stops at any higher-level heading" do
+      d = MarkdownDocument.new("spec/files/lorem.md")
+      content = d.content?(3).try &.gets_to_end
+
+      content.should_not be_nil
+      content = content.not_nil!
+
+      content.strip.should eq <<-END
       Mauris dolor felis, sagittis at, luctus sed, aliquam non, tellus.
       Integer rutrum, orci vestibulum ullamcorper ultricies, lacus quam
       ultricies odio, vitae placerat pede sem sit amet enim.

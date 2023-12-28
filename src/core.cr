@@ -26,7 +26,7 @@ module Cheet
     def content?(heading : Int32) : IO?
       start_heading = index.headings[heading]
       return nil unless start_heading
-      next_heading = index.next_at_level(heading, start_heading.level)
+      next_heading = index.next_above_or_at_level(heading, start_heading.level)
       skip_to_content(start_heading)
       if next_heading
         # Read only to `next_heading`
@@ -57,17 +57,17 @@ module Cheet
     end
 
     def next_at_level(start : Int32, level : UInt8) : Heading?
-      next_heading = nil
-      # headings = @index.headings.each
-      k = start + 1
-      while k < headings.size && !next_heading
-        kheading = headings[k]
-        k += 1
-        if kheading.level == level
-          next_heading = kheading
-        end
-      end
-      next_heading
+      headings.each
+          .skip(start + 1)
+          .select { |heading| heading.level == level }
+          .first
+    end
+
+    def next_above_or_at_level(start : Int32, level : UInt8) : Heading?
+      headings.each
+          .skip(start + 1)
+          .select { |heading| heading.level <= level }
+          .first
     end
   end
 
