@@ -1,5 +1,6 @@
 module Cheet
 
+  alias Area = Array(Path)
   alias Topic = String
 
   abstract class Document
