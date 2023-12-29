@@ -1,5 +1,7 @@
 module Cheet
 
+  Log = ::Log.for "cheet"
+
   alias Area = Array(Path)
   alias Topic = String
 
