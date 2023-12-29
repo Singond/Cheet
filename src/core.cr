@@ -89,7 +89,8 @@ module Cheet
   end
 
   # Yields every path inside *dirname* and any subdirectories to the block.
-  def self.each_child_recursive(dirname : Dir | Path | String)
+  def self.each_child_recursive(dirname : Dir | Path | String,
+      skip_hidden = true)
     parents = Deque({Iterator(String), Path}).new
     case dirname
     in Dir
@@ -110,6 +111,7 @@ module Cheet
         parents.pop
         next
       end
+      next if skip_hidden && elem.starts_with? "."
       path = parent_path / elem
       if File.directory? path
         parents.push({Dir.new(path).each_child, path})
