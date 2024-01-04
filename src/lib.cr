@@ -14,6 +14,23 @@ module Cheet
     def initialize
       Log.info { "Initializing default config" }
     end
+
+    def load_env(env = ENV)
+      Log.debug { "Loading configuration from environment variables..." }
+      env["CHEET_PATH"]?.try do |value|
+        Log.debug { "Loading path from $CHEET_PATH" }
+        newpath = Array(Path).new
+        value.split(':') do |part|
+          path = Path[part]
+          if path.absolute?
+            newpath << path
+          else
+            Log.error { "CHEET_PATH must be absolute" }
+          end
+        end
+        @search_path = newpath unless newpath.empty?
+      end
+    end
   end
 
   def self.load_document(path)
@@ -41,6 +58,7 @@ module Cheet
       end
     else
       Log.info { "No area given, searching all files in path" }
+      Log.debug { "path is #{config.search_path.map(&.to_s).join(":")}" }
       each_file_recursive config.search_path do |path|
         Log.debug { "Searching directory #{path}" }
         yield path
