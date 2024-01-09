@@ -28,4 +28,18 @@ describe Cheet::Config do
       ]
     end
   end
+
+  describe ".layer" do
+    it "copies the attribute of the first object where it is non-nil" do
+      cfg1 = Config.new
+      cfg1.stdout = STDERR
+      cfg1.search_path = nil
+      cfg2 = Config.new
+      cfg2.stdout = STDOUT
+      cfg2.search_path = [Path["/home/user/"]]
+      layered = Config.layer(cfg1, cfg2)
+      layered.stdout.should eq STDERR
+      layered.search_path.should eq [Path["/home/user/"]]
+    end
+  end
 end
