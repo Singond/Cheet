@@ -11,20 +11,21 @@ struct Cheet::Config
     Log.info { "Initializing default config" }
   end
 
-  def load_env(env = ENV)
+  def self.from_env(env = ENV)
     Log.debug { "Loading configuration from environment variables..." }
+    config = self.new
     env["CHEET_PATH"]?.try do |value|
       Log.debug { "Loading path from $CHEET_PATH" }
-      newpath = Array(Path).new
+      config.search_path = Array(Path).new
       value.split(':') do |part|
         path = Path[part]
         if path.absolute?
-          newpath << path
+          config.search_path << path
         else
           Log.error { "CHEET_PATH must be absolute" }
         end
-        @search_path = newpath unless newpath.empty?
       end
     end
+    config
   end
 end
