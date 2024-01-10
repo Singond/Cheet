@@ -24,15 +24,15 @@ module Cheet
 
   def self.each_file(area : Area?, config = Config.new)
     if area
-      Log.info { "Area given, searching only matching files" }
+      Log.info { "Area given, processing only matching files" }
       area.each do |path|
         yield path
       end
     else
-      Log.info { "No area given, searching all files in path" }
+      Log.info { "No area given, processing all files in path" }
       Log.debug { "path is #{config.search_path.map(&.to_s).join(":")}" }
       each_file_recursive config.search_path do |path|
-        Log.debug { "Searching directory #{path}" }
+        Log.trace { "Processing #{path}" }
         yield path
       end
     end

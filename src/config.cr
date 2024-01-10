@@ -9,7 +9,7 @@ struct Cheet::Config
   end
 
   def initialize
-    Log.info { "Initializing default config" }
+    Log.trace { "Initializing default config" }
   end
 
   # Returns a new `Config` with values read from environment variables.
