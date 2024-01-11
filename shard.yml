@@ -1,0 +1,13 @@
+name: cheet
+version: 0.1.0-alpha
+description: |
+  A tool to search cheat sheets.
+authors:
+  - Jan Singon Slany <singond@seznam.cz>
+license: Apache-2.0
+repository: "https://github.com/Singond/Cheet.git"
+
+crystal: ">= 1.0, < 2.0"
+targets:
+  cheet:
+    main: src/cheet.cr
