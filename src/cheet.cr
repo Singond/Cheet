@@ -12,7 +12,18 @@ module Cheet::Cli
     area = nil
     topics = [] of Topic
     config = Config.new
+
     parser = OptionParser.new do |p|
+      p.banner = <<-USAGE
+      Usage: cheet [AREA] [TOPIC...]
+
+      Options:
+      USAGE
+
+      p.on "-h", "--help", "Show help and exit" do
+        help(STDOUT, p)
+      end
+
       p.on "-v", "--verbose", "Increase verbosity" do
         current_level = Log.level
         if current_level > ::Log::Severity::Trace
@@ -20,6 +31,7 @@ module Cheet::Cli
           Log.debug { "Log level set to #{Log.level}" }
         end
       end
+
       p.unknown_args do |args|
         if args.size > 1
           area = parse_area?(args[0])
@@ -27,8 +39,14 @@ module Cheet::Cli
         topics = area ? args[1..] : args
       end
     end
+
     parser.parse(args)
     {area, topics, config}
+  end
+
+  private def help(io, parser)
+    io << parser
+    io << "\n"
   end
 
   private def parse_area?(str : String) : Area?
