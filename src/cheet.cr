@@ -12,6 +12,7 @@ module Cheet::Cli
     area = nil
     topics = [] of Topic
     config = Config.new
+    after = nil
 
     parser = OptionParser.new do |p|
       p.banner = <<-USAGE
@@ -33,6 +34,15 @@ module Cheet::Cli
         end
       end
 
+      p.on "--version", "Print version information" do
+        # Delay execution until after all arguments are parsed
+        # to account for later options (specifically --verbose).
+        after = -> {
+          print_version(STDOUT, Log.level <= ::Log::Severity::Info)
+          exit 0
+        }
+      end
+
       p.unknown_args do |args|
         if args.size > 1
           area = parse_area?(args[0])
@@ -42,6 +52,7 @@ module Cheet::Cli
     end
 
     parser.parse(args)
+    after.try &.call
     {area, topics, config}
   end
 

@@ -1,5 +1,9 @@
 module Cheet
 
+  VERSION = {{ `shards version #{__DIR__}`.chomp.stringify }}
+  BUILD_DATE = {{ `date -u -I`.chomp.stringify }}
+  REVISION = {{ env("CHEET_GIT_COMMIT") }}
+
   Log = ::Log.for "cheet"
 
   alias Area = Array(Path)
@@ -141,6 +145,25 @@ module Cheet
   def self.each_file_recursive(dir)
     each_child_recursive(dir) do |child|
       yield child if File.file? child
+    end
+  end
+
+  # Prints version information into *io*.
+  #
+  # The information printed includes the program version and the date
+  # it was built.
+  #
+  # If a configuration object is given and the log level is higher than
+  # `Notice`, it includes additional information like the corresponding
+  # Git commit hash (provided it was available at compile time).
+  def print_version(io = STDOUT, revision = false)
+    io << "Cheet "
+    io << VERSION
+    io << " ("
+    io << BUILD_DATE
+    io << ")\n"
+    if revision && (rev = REVISION) && !rev.empty?
+      io << "git revision: #{REVISION}\n"
     end
   end
 end
