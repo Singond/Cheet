@@ -66,14 +66,14 @@ module Cheet
       headings.each
           .skip(start + 1)
           .select { |heading| heading.level == level }
-          .first
+          .first?
     end
 
     def next_above_or_at_level(start : Int32, level = level_of(start)) : Heading?
       headings.each
           .skip(start + 1)
           .select { |heading| heading.level <= level }
-          .first
+          .first?
     end
 
     private def level_of(index)
