@@ -22,6 +22,7 @@ module Cheet::Cli
 
       p.on "-h", "--help", "Show help and exit" do
         help(STDOUT, p)
+        exit 0
       end
 
       p.on "-v", "--verbose", "Increase verbosity" do
