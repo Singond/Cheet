@@ -11,6 +11,7 @@ module Cheet
   end
 
   def self.print_topic(document, topic : Topic, output = STDOUT)
+    Log.debug { "Searching topic '#{topic}' in #{document}" }
     document.content?(&.value.includes? topic).try do |content|
       IO.copy content, output
     end
