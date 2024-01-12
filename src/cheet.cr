@@ -49,6 +49,11 @@ module Cheet::Cli
         end
         topics = area ? args[1..] : args
       end
+
+      p.invalid_option do |opt|
+        Log.error { "invalid option: #{opt}" }
+        exit 2
+      end
     end
 
     parser.parse(args)
