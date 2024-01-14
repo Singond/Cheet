@@ -2,14 +2,14 @@ require "spec"
 require "../src/index"
 
 lorem_index = Cheet::Index.new
-lorem_index.headings << Cheet::Heading.new "The Document", 1, 0         # [0]
-lorem_index.headings << Cheet::Heading.new "Sed vel lectus", 2, 100     # [1]
-lorem_index.headings << Cheet::Heading.new "Quisque porta", 2, 300      # [2]
-lorem_index.headings << Cheet::Heading.new "Cras elementum", 3, 400     # [3]
-lorem_index.headings << Cheet::Heading.new "Aenean placerat", 2, 450    # [4]
-lorem_index.headings << Cheet::Heading.new "Pellentesque arcu", 3, 700  # [5]
-lorem_index.headings << Cheet::Heading.new "Aliquam ante", 1, 1000      # [6]
-lorem_index.headings << Cheet::Heading.new "Duis risus", 2, 1200        # [7]
+lorem_index << Cheet::Heading.new "The Document", 1, 0         # [0]
+lorem_index << Cheet::Heading.new "Sed vel lectus", 2, 100     # [1]
+lorem_index << Cheet::Heading.new "Quisque porta", 2, 300      # [2]
+lorem_index << Cheet::Heading.new "Cras elementum", 3, 400     # [3]
+lorem_index << Cheet::Heading.new "Aenean placerat", 2, 450    # [4]
+lorem_index << Cheet::Heading.new "Pellentesque arcu", 3, 700  # [5]
+lorem_index << Cheet::Heading.new "Aliquam ante", 1, 1000      # [6]
+lorem_index << Cheet::Heading.new "Duis risus", 2, 1200        # [7]
 
 describe Cheet::Index do
   describe "#next_at_level" do

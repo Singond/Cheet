@@ -24,7 +24,7 @@ module Cheet::Markdown
             lvl += 1
           end
           value = line[lvl..].strip
-          idx.headings << Heading.new(value, lvl, offset)
+          idx << Heading.new(value, lvl, offset)
         end
         prev_line = line
         prev_line_offset = offset

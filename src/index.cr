@@ -1,7 +1,21 @@
 require "./heading"
 
 class Cheet::Index
+  include Indexable(Heading)
+
   getter headings = [] of Heading
+
+  def <<(heading)
+    @headings << heading
+  end
+
+  def size
+    @headings.size
+  end
+
+  def unsafe_fetch(index)
+    @headings[index]
+  end
 
   def to_s(io : IO)
     io << @headings

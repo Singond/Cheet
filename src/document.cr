@@ -21,7 +21,7 @@ abstract class Cheet::Document
 
   # Returns the content of the heading given by its index.
   def content?(heading : Int32) : IO?
-    start_heading = index.headings[heading]
+    start_heading = index[heading]
     return nil unless start_heading
     next_heading = index.next_above_or_at_level(heading, start_heading.level)
     skip_to_content(start_heading)
@@ -37,7 +37,7 @@ abstract class Cheet::Document
   # Returns the content of the heading for which the given block
   # is truthy.
   def content? : IO?
-    heading_index = index.headings.index do |heading|
+    heading_index = index.index do |heading|
       yield heading
     end
     heading_index.try do |idx|
