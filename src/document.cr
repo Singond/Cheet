@@ -8,12 +8,18 @@ abstract class Cheet::Document
     @file = File.new(name)
   end
 
-  abstract def do_index : Index
+  # Builds the index of headings in this document.
+  abstract def build_index : Index
+
+  # Seeks within the underlying file the content immediately after
+  # *heading*.
+  #
+  # This method should not be called by clients directly.
   abstract def skip_to_content(heading : Heading)
 
   def index : Index
     unless idx = @index
-      idx = do_index
+      idx = build_index
       @index = idx
     end
     idx.not_nil!

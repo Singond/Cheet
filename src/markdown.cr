@@ -9,7 +9,7 @@ module Cheet::Markdown
       super(name)
     end
 
-    def do_index : Index
+    def build_index : Index
       offset = 0u64
       prev_line = ""
       prev_line_offset = 0u64
