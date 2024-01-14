@@ -3,12 +3,20 @@ require "../src/document"
 
 class TestDocument < Cheet::Document
 
-  def initialize
+  def initialize(@index)
     @file = File.tempfile
   end
 
   def build_index : Cheet::Index
-    index = Cheet::Index.new
+    @index.not_nil!
+  end
+
+  def skip_to_content(heading)
+  end
+end
+
+def loremdoc
+  TestDocument.new(Cheet::Index.new.tap { |index|
     index << Cheet::Heading.new "The Document", 1, 0         # [0]
     index << Cheet::Heading.new "Sed vel lectus", 2, 100     # [1]
     index << Cheet::Heading.new "Quisque porta", 2, 300      # [2]
@@ -17,18 +25,13 @@ class TestDocument < Cheet::Document
     index << Cheet::Heading.new "Pellentesque arcu", 3, 700  # [5]
     index << Cheet::Heading.new "Aliquam ante", 1, 1000      # [6]
     index << Cheet::Heading.new "Duis risus", 2, 1200        # [7]
-    index
-  end
-
-  def skip_to_content(heading)
-  end
+  })
 end
 
 describe Cheet::Document do
   describe "#content(heading)?" do
     it "returns nil if the heading is out of bounds" do
-      testdoc = TestDocument.new
-      testdoc.content?(12).should be_nil
+      loremdoc.content?(12).should be_nil
     end
   end
 end
