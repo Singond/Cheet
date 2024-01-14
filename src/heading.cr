@@ -13,4 +13,21 @@ class Cheet::Heading
   def inspect(io : IO)
     to_s io
   end
+
+  def matches?(*args)
+    @value.matches? *args
+  end
+
+  def matches?(topic : Topic, *, case_insensitive = true, whole_word = true)
+    heading = @value
+    if case_insensitive
+      heading = heading.downcase
+      topic = topic.downcase
+    end
+    if whole_word
+      heading.split.any? &.== topic
+    else
+      heading.includes? topic
+    end
+  end
 end
