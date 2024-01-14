@@ -1,4 +1,5 @@
 require "./core"
+require "./document"
 
 module Cheet::Markdown
 

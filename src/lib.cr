@@ -1,6 +1,7 @@
 require "log"
 require "./core"
 require "./config"
+require "./document"
 require "./markdown"
 
 module Cheet
