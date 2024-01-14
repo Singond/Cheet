@@ -13,6 +13,10 @@ class TestDocument < Cheet::Document
 
   def skip_to_content(heading)
   end
+
+  def public_content_by_index(*args)
+    content_by_index *args
+  end
 end
 
 def loremdoc
@@ -32,6 +36,14 @@ describe Cheet::Document do
   describe "#content(heading)?" do
     it "returns nil if the heading is out of bounds" do
       loremdoc.content?(12).should be_nil
+    end
+  end
+
+  describe "#content_by_index" do
+    it "raises if *heading_index* does not match *heading*" do
+      expect_raises(Exception, /index does not match/) do
+        loremdoc.public_content_by_index(loremdoc.index[2], 4)
+      end
     end
   end
 end

@@ -26,11 +26,26 @@ abstract class Cheet::Document
   end
 
   # Returns the content of the heading given by its index.
-  def content?(heading : Int32) : IO?
-    start_heading = index[heading]?
-    return nil unless start_heading
-    next_heading = index.next_above_or_at_level(heading, start_heading.level)
-    skip_to_content(start_heading)
+  #
+  # Returns nil if *heading_index* is out of bounds.
+  def content?(heading_index : Int32) : IO?
+    heading = index[heading_index]?
+    heading ? content_by_index(heading, heading_index) : nil
+  end
+
+  # Returns the content of *heading*.
+  #
+  # If given, *heading_index* should be the index of *heading*
+  # in this document's index.
+  protected def content_by_index(heading : Heading, heading_index = nil) : IO
+    if !heading_index
+      heading_index = index.index!(heading)
+    elsif heading != index[heading_index]
+      # Given *heading_index* is inconsistent with @index
+      raise "Heading index does not match heading"
+    end
+    next_heading = index.next_above_or_at_level(heading_index, heading.level)
+    skip_to_content(heading)
     if next_heading
       # Read only to `next_heading`
       IO::Sized.new(@file, read_size: next_heading.offset - @file.pos)
