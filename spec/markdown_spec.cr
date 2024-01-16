@@ -1,7 +1,6 @@
 require "spec"
 require "../src/markdown"
 
-include Cheet
 include Cheet::Markdown
 
 describe MarkdownDocument do
