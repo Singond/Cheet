@@ -4,6 +4,38 @@ require "../src/markdown"
 include Cheet::Markdown
 
 describe MarkdownDocument do
+  describe "build_index" do
+    it "creates an index from headings in the document" do
+      d = MarkdownDocument.new("spec/files/lorem.md")
+      idx = d.index
+      idx.size.should eq 8
+      idx[0].value.should eq "The Document"
+      idx[0].level.should eq 1
+      idx[0].offset.should eq 0
+      idx[1].value.should eq "Sed vel lectus"
+      idx[1].level.should eq 2
+      idx[1].offset.should eq 0xb1
+      idx[2].value.should eq "Quisque porta"
+      idx[2].level.should eq 2
+      idx[2].offset.should eq 0x1f6
+      idx[3].value.should eq "Cras elementum"
+      idx[3].level.should eq 3
+      idx[3].offset.should eq 0x2d0
+      idx[4].value.should eq "Aenean placerat"
+      idx[4].level.should eq 2
+      idx[4].offset.should eq 0x39f
+      idx[5].value.should eq "Pellentesque arcu"
+      idx[5].level.should eq 3
+      idx[5].offset.should eq 0x44b
+      idx[6].value.should eq "Aliquam ante"
+      idx[6].level.should eq 1
+      idx[6].offset.should eq 0x4ec
+      idx[7].value.should eq "Duis risus"
+      idx[7].level.should eq 2
+      idx[7].offset.should eq 0x595
+    end
+  end
+
   describe "#content?(Int32)" do
     it "retrieves the content including subsections" do
       d = MarkdownDocument.new("spec/files/lorem.md")
