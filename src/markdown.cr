@@ -1,5 +1,7 @@
 require "./core"
 require "./document"
+require "./parsing"
+require "./two_line_iterator"
 
 module Cheet::Markdown
 
@@ -10,25 +12,12 @@ module Cheet::Markdown
     end
 
     def build_index : Index
-      offset = 0u64
-      prev_line = ""
-      prev_line_offset = 0u64
       idx = Index.new
-
       @file.seek(0)
-      @file.each_line do |line|
-        if line.starts_with?('#')
-          lvl = 0u8
-          chars = line.each_char
-          while chars.next == '#'
-            lvl += 1
-          end
-          value = line[lvl..].strip
-          idx << Heading.new(value, lvl, offset)
-        end
-        prev_line = line
-        prev_line_offset = offset
-        offset = @file.pos.to_u64
+      TwoLineIterator.new(@file).each do |line, offset, next_line|
+        heading = Cheet.atx_heading(line, offset)
+        heading ||= Cheet.setext_heading({line, next_line}, offset)
+        idx << heading if heading
       end
       idx
     end
