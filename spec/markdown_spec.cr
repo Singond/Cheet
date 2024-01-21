@@ -102,8 +102,8 @@ describe MarkdownDocument do
     end
   end
 
-  describe "#content?(Topic)" do
-    it "retrieves the content under a heading" do
+  describe "#content?(&block)" do
+    it "retrieves the content under the first matching heading" do
       d = MarkdownDocument.new("spec/files/lorem.md")
       content = (d.content? &.value.includes?("lectus")).try &.gets_to_end
 

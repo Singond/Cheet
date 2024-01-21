@@ -55,7 +55,7 @@ abstract class Cheet::Document
     end
   end
 
-  # Returns the content of the heading for which the given block
+  # Returns the content of the first heading for which the given block
   # is truthy.
   def content? : IO?
     heading_index = index.index do |heading|
