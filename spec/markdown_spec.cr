@@ -100,6 +100,16 @@ describe MarkdownDocument do
       ultricies odio, vitae placerat pede sem sit amet enim.
       END
     end
+
+    it "stops at any higher-level heading" do
+      d = MarkdownDocument.new("spec/files/lorem_setext.md")
+      content = d.content?(6).try &.gets_to_end
+
+      content.should_not be_nil
+      content = content.not_nil!
+
+      content.strip.should start_with "Etiam quis quam."
+    end
   end
 
   describe "#content?(&block)" do

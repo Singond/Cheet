@@ -24,7 +24,11 @@ module Cheet::Markdown
 
     def skip_to_content(heading : Heading)
       @file.seek(heading.offset)
-      @file.gets
+      heading = @file.gets
+      unless heading && heading.lstrip.starts_with? '#'
+        # Skip underline
+        @file.gets
+      end
     end
   end
 end
