@@ -1,3 +1,4 @@
+require "colorize"
 require "log"
 require "./core"
 require "./config"
@@ -11,8 +12,11 @@ module Cheet
     Markdown::MarkdownDocument.new path
   end
 
-  def self.print_header(document, output = STDOUT)
-    output << document.name << ":\n"
+  def self.print_header(document, output = STDOUT, color = :default)
+    Colorize.with.fore(color).surround(output) do
+      output << document.name << ":"
+    end
+    output << "\n"
   end
 
   def self.print_content(content, output = STDOUT)
@@ -59,7 +63,9 @@ module Cheet
         first_topic = true
         search_topics doc, topics do |topic, content|
           config.stdout << "\n" unless first_doc
-          print_header doc, config.stdout if first_topic
+          if first_topic
+            print_header doc, config.stdout, color: config.header_color
+          end
           print_content content, config.stdout
           first_doc = false
           first_topic = false

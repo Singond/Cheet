@@ -7,6 +7,7 @@ struct Cheet::Config
     [Path.home / ".local/share/cheet",
     Path.home / ".cheet"]
   end
+  property header_color = :blue
 
   def initialize
     Log.trace { "Initializing default config" }
