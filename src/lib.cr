@@ -15,16 +15,22 @@ module Cheet
     output << document.name << ":\n"
   end
 
-  def self.print_topic(document, topic : Topic, output = STDOUT)
+  def self.print_content(content, output = STDOUT)
+    IO.copy content, output
+  end
+
+  def self.search_topic(document, topic : Topic)
     Log.debug { "Searching topic '#{topic}' in #{document}" }
     document.content?(&.matches? topic).try do |content|
-      IO.copy content, output
+      yield topic, content
     end
   end
 
-  def self.print_topics(document, topics : Array, output = STDOUT)
+  def self.search_topics(document, topics : Array)
     topics.each do |topic|
-      print_topic document, topic, output
+      search_topic document, topic do |topic, content|
+        yield topic, content
+      end
     end
   end
 
@@ -45,10 +51,19 @@ module Cheet
   end
 
   def self.run(area : Area?, topics : Array(Topic), config = Config.new)
+    first_doc = true
     each_file(area, config) do |path|
       if File.exists? path
         Log.info { "Searching file #{path}" }
-        print_topics load_document(path), topics, config.stdout
+        doc = load_document(path)
+        first_topic = true
+        search_topics doc, topics do |topic, content|
+          config.stdout << "\n" unless first_doc
+          print_header doc, config.stdout if first_topic
+          print_content content, config.stdout
+          first_doc = false
+          first_topic = false
+        end
       end
     end
   end
