@@ -4,7 +4,7 @@ abstract class Cheet::Document
   @file : File
   @index : Index?
 
-  def initialize(name)
+  def initialize(@name : Path | String)
     @file = File.new(name)
   end
 
@@ -16,6 +16,10 @@ abstract class Cheet::Document
   #
   # This method should not be called by clients directly.
   abstract def skip_to_content(heading : Heading)
+
+  def name
+    @name
+  end
 
   def index : Index
     unless idx = @index

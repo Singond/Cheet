@@ -11,6 +11,10 @@ module Cheet
     Markdown::MarkdownDocument.new path
   end
 
+  def self.print_header(document, output = STDOUT)
+    output << document.name << ":\n"
+  end
+
   def self.print_topic(document, topic : Topic, output = STDOUT)
     Log.debug { "Searching topic '#{topic}' in #{document}" }
     document.content?(&.matches? topic).try do |content|
