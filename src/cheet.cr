@@ -9,8 +9,7 @@ module Cheet::Cli
   Log = ::Log.for "cheet"
 
   def parse_args(args)
-    area = nil
-    topics = [] of Topic
+    positional_args = [] of String
     config = Config.new
     after = nil
 
@@ -44,10 +43,7 @@ module Cheet::Cli
       end
 
       p.unknown_args do |args|
-        if args.size > 1
-          area = parse_area?(args[0])
-        end
-        topics = area ? args[1..] : args
+        positional_args = args
       end
 
       p.invalid_option do |opt|
@@ -58,7 +54,7 @@ module Cheet::Cli
 
     parser.parse(args)
     after.try &.call
-    {area, topics, config}
+    {positional_args, config}
   end
 
   private def help(io, parser)
@@ -66,21 +62,38 @@ module Cheet::Cli
     io << "\n"
   end
 
-  private def parse_area?(str : String) : Area?
+  private def split_positional_args(args, search_path)
+    if args.size > 1
+      search_path |= [] of Path
+      area = parse_area?(args[0], search_path)
+    end
+    topics = area ? args[1..] : args
+    {area, topics}
+  end
+
+  private def parse_area?(str : String, search_path) : Area?
+    Log.info { "Parsing area..." }
     if str.includes?('/')
       [Path.new(str)]
     else
       nil
     end
+    Log.info { "Area is #{area ? area.join(", ") : "nil"}" }
+    area
   end
 
   def main(args = ARGV)
-    area, topics, config_args = parse_args(args)
-    config = Config.layer(config_args, Config.from_env)
+    posargs, config_args = parse_args(args)
+    config_env = Config.from_env
+    Log.debug { "Merging configuration from arguments and environment" }
+    config = Config.layer(config_args, config_env)
+    Log.debug { "Path is #{config.search_path.map(&.to_s).join(":")}" }
+    area, topics = split_positional_args(posargs, config.search_path)
     Cheet.run(area, topics, config)
   end
 end
 
 Log.define_formatter Fmt, "#{source}: #{message}"
-Log.setup "cheet", :notice, Log::IOBackend.new(STDERR, formatter: Fmt)
+Log.setup "cheet", :notice,
+    Log::IOBackend.new(STDERR, formatter: Fmt, dispatcher: :sync)
 Cheet::Cli.main

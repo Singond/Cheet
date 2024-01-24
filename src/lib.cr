@@ -32,7 +32,7 @@ module Cheet
   end
 
   def self.search_topic(document, topic : Topic)
-    Log.debug { "Searching topic '#{topic}' in #{document}" }
+    Log.debug { "Searching topic '#{topic}' in #{document.name}" }
     document.content?(&.matches? topic).try do |content|
       yield topic, content
     end
@@ -54,7 +54,6 @@ module Cheet
       end
     else
       Log.info { "No area given, processing all files in path" }
-      Log.debug { "path is #{config.search_path.map(&.to_s).join(":")}" }
       each_file_recursive config.search_path do |path|
         Log.trace { "Processing #{path}" }
         yield path
@@ -66,7 +65,7 @@ module Cheet
     first_doc = true
     each_file(area, config) do |path|
       if File.exists? path
-        Log.info { "Searching file #{path}" }
+        Log.info { "Searching file #{path}..." }
         doc = load_document(path)
         first_topic = true
         search_topics doc, topics do |topic, content|
