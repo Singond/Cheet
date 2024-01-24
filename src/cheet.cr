@@ -74,9 +74,26 @@ module Cheet::Cli
   private def parse_area?(str : String, search_path) : Area?
     Log.info { "Parsing area..." }
     if str.includes?('/')
-      [Path.new(str)]
+      area = [Path.new(str)]
     else
-      nil
+      matching = [] of Path
+      str = str.downcase
+      Log.info { "Searching files matching '#{str}'" }
+      search_path.each do |dir|
+        unless File.directory? dir
+          Log.debug { "#{dir} does not exist" }
+          next
+        end
+        Log.debug { "Searching in #{dir}" }
+        Cheet.each_file_recursive(dir) do |path|
+          Log.debug { "Trying #{path}" }
+          if path.basename.downcase.includes? str
+            Log.debug { "Found #{path}" }
+            matching << path
+          end
+        end
+      end
+      area = matching unless matching.empty?
     end
     Log.info { "Area is #{area ? area.join(", ") : "nil"}" }
     area
