@@ -15,8 +15,9 @@ describe Cheet do
       str = str.strip
       lines = str.lines
 
-      str.should start_with "Phasellus enim erat"
-      str.lines.size.should eq 10
+      lines.size.should eq 11
+      lines[0].should contain "lorem.md"
+      lines[1].should start_with "Phasellus enim erat"
       str.should contain "### Cras elementum"
       str.should end_with "vitae placerat pede sem sit amet enim."
     end
