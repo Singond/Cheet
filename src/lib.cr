@@ -20,7 +20,15 @@ module Cheet
   end
 
   def self.print_content(content, output = STDOUT)
+    skip_whitespace content, output
     IO.copy content, output
+  end
+
+  private def self.skip_whitespace(input, output)
+    while (c = input.read_char) && c.whitespace?
+      # skip
+    end
+    output << c if c
   end
 
   def self.search_topic(document, topic : Topic)
