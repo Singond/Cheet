@@ -8,6 +8,7 @@ describe Cheet do
     it "searches topics in area" do
       config = Config.new
       config.search_path = [Path["spec/files"]]
+      config.header_color = :default
       str = String.build do |builder|
         config.stdout = builder
         Cheet.run nil, ["Quisque"], config

@@ -4,6 +4,7 @@ require "../src/document"
 class TestDocument < Cheet::Document
 
   def initialize(@index)
+    @name = "test document"
     @file = File.tempfile
   end
 
