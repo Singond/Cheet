@@ -62,22 +62,23 @@ module Cheet
   end
 
   def self.run(area : Area?, topics : Array(Topic), config = Config.new)
-    first_doc = true
+    matches_count = 0
     each_file(area, config) do |path|
       if File.exists? path
         Log.info { "Searching file #{path}..." }
         doc = load_document(path)
         first_topic = true
         search_topics doc, topics do |topic, content|
-          config.stdout << "\n" unless first_doc
+          config.stdout << "\n" unless matches_count == 0
           if first_topic
             print_header doc, config.stdout, color: config.header_color
+            first_topic = false
           end
           print_content content, config.stdout
-          first_doc = false
-          first_topic = false
+          matches_count += 1
         end
       end
     end
+    matches_count
   end
 end

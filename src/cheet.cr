@@ -106,7 +106,8 @@ module Cheet::Cli
     config = Config.layer(config_args, config_env)
     Log.debug { "Path is #{config.search_path.map(&.to_s).join(":")}" }
     area, topics = split_positional_args(posargs, config.search_path)
-    Cheet.run(area, topics, config)
+    count = Cheet.run(area, topics, config)
+    exit 1 if count == 0
   end
 end
 
