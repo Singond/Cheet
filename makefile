@@ -22,13 +22,13 @@ install: $(installables)
 	@echo "Installing $(DESTDIR)$(PREFIX)/bin/cheet"
 	install -d $(DESTDIR)$(PREFIX)/bin/
 	install -m 755 cheet $(DESTDIR)$(PREFIX)/bin/
-	# install -d $(DESTDIR)$(PREFIX)/share/man/man1/
-	# install -m 644 doc/cheet.1 $(DESTDIR)$(PREFIX)/share/man/man1/
+	install -d $(DESTDIR)$(PREFIX)/share/man/man1/
+	install -m 644 doc/cheet.1 $(DESTDIR)$(PREFIX)/share/man/man1/
 
 .PHONY: uninstall
 uninstall:
 	rm -f $(DESTDIR)$(PREFIX)/bin/cheet
-	# rm -f $(DESTDIR)$(PREFIX)/share/man/man1/cheet.1
+	rm -f $(DESTDIR)$(PREFIX)/share/man/man1/cheet.1
 
 dist: $(distfile)
 $(distfile): $(all_files)

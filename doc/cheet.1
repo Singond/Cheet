@@ -1,0 +1,89 @@
+.TH CHEET 1 2024-01-25
+.SH NAME
+cheet \- search sections by topic in document
+.
+.SH SYNOPSIS
+.SY cheet
+.RI [ OPTIONS ]
+.RI [ AREA ]
+.IR TOPIC ...
+.YS
+.
+.SH DESCRIPTION
+Cheet searches for headings matching \fITOPIC\fR in a pre-defined
+set of marked-up documents, optionally restricted to \fIAREA\fR,
+and prints the corresponding sections (and subsections) to output.
+.PP
+\fIAREA\fR can be a part of a filename or a path.
+If given, cheet only searches the matching file or files.
+\fIAREA\fR is distinguished from \fITOPIC\fR by either looking like a path
+(ie. containing \fB/\fR) or the existence of a matching filename.
+If it does not look like a path and matches no filename in the search path,
+it is treated as a \fITOPIC\fR.
+.PP
+Currently, cheet only understands Markdown documents, using both ATX-style
+headings (\fB#\fR-marks) or setext-style headings (underlines).
+Note that the parsing procedure is rather crude and definitely not
+standards-compliant. It can easily be fooled, for example by headings
+inside code blocks, which will not be ignored but treated as regular headings.
+Support for more markup languages is possible, but not implemented.
+.PP
+The directories to be searched for documents are given by the CHEET_PATH
+environment variable. If empty, the default directories are
+\fI~/.local/share/cheet\fR and \fI~/.cheet\fR.
+.
+.SH OPTIONS
+.TP 4
+.BR \-v , \ \-\-verbose
+Increase verbosity. This option can be repeated to increase verbosity
+even further.
+.TP
+.BR \-h , \ \-\-help
+Print usage and exit.
+.TP
+.B \-\-version
+Print version and exit.
+.
+.SH EXIT STATUS
+The exit status is 0 if a matching section was found,
+1 if no section was found and 2 if an error occured.
+.SH ENVIRONMENT
+The search path can be set by the CHEET_PATH environment variable.
+This is a list of directories separated by colons.
+If CHEET_PATH is not defined, the default set of directories will be searched:
+.IP
+~/.local/share/cheet
+.IP
+~/.cheet
+.PP
+Coloured output can be disabled by setting the NO_COLOR variable to any value.
+.SH EXAMPLES
+Searching for a section on Crystal coding style might look like the following:
+.IP
+cheet crystal style
+.PP
+If a file called \fIcrystal.md\fR or similar is found somewhere in your
+search path, and it contains a heading containing the word "syntax",
+the output might look like this:
+.IP
+.nf
+/home/user/.cheet/crystal.md:
+Naming Conventions
+------------------
+- types: `PascalCase`
+- methods: `snake_case`
+- variables: `snake_case`
+- constants: `SCREAMING_SNAKE_CASE`
+
+Documentation
+-------------
+Start lines with `#`, use indicative mood.
+
+Use markdown. To reference other elements, use backticks:
+- types and constants: `` `MyClass` ``
+- instance methods: `` `#my_method` ``
+- class methods: `` `.my_class_method` ``
+.fi
+.PP
+This example assumes that "Syntax" is a level one heading and contains
+the two sub-headings shown in the output.
