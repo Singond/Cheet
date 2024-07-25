@@ -54,7 +54,7 @@ module Cheet::Cli
 
     parser.parse(args)
     after.try &.call
-    {positional_args, config}
+    {positional_args, config, parser}
   end
 
   private def help(io, parser)
@@ -100,7 +100,11 @@ module Cheet::Cli
   end
 
   def main(args = ARGV)
-    posargs, config_args = parse_args(args)
+    posargs, config_args, parser = parse_args(args)
+    if args.empty?
+      help STDOUT, parser
+      exit 2
+    end
     config_env = Config.from_env
     Log.debug { "Merging configuration from arguments and environment" }
     config = Config.layer(config_args, config_env)
