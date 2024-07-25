@@ -10,4 +10,4 @@ repository: "https://github.com/Singond/Cheet.git"
 crystal: ">= 1.0, < 2.0"
 targets:
   cheet:
-    main: src/cheet.cr
+    main: src/cli.cr

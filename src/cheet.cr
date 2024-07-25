@@ -1,117 +1,81 @@
-require "option_parser"
-require "./lib"
+require "colorize"
+require "log"
+require "./cheet/*"
 
-include Cheet
-include Cheet::Markdown
+module Cheet
 
-module Cheet::Cli
-  extend self
-  Log = ::Log.for "cheet"
+  def self.load_document(path)
+    # TODO: Determine file format, possibly suport other formats
+    Markdown::MarkdownDocument.new path
+  end
 
-  def parse_args(args)
-    positional_args = [] of String
-    config = Config.new
-    after = nil
+  def self.print_header(document, output = STDOUT, color = :default)
+    Colorize.with.fore(color).surround(output) do
+      output << document.name << ":"
+    end
+    output << "\n"
+  end
 
-    parser = OptionParser.new do |p|
-      p.banner = <<-USAGE
-      Usage: cheet [AREA] [TOPIC...]
+  def self.print_content(content, output = STDOUT)
+    skip_whitespace content, output
+    IO.copy content, output
+  end
 
-      Options:
-      USAGE
+  private def self.skip_whitespace(input, output)
+    while (c = input.read_char) && c.whitespace?
+      # skip
+    end
+    output << c if c
+  end
 
-      p.on "-h", "--help", "Show help and exit" do
-        help(STDOUT, p)
-        exit 0
-      end
+  def self.search_topic(document, topic : Topic)
+    Log.debug { "Searching topic '#{topic}' in #{document.name}" }
+    document.content?(&.matches? topic).try do |content|
+      yield topic, content
+    end
+  end
 
-      p.on "-v", "--verbose", "Increase verbosity" do
-        current_level = Log.level
-        if current_level > ::Log::Severity::Trace
-          Log.level = current_level - 1
-          Log.debug { "Log level set to #{Log.level}" }
-        end
-      end
-
-      p.on "--version", "Print version information" do
-        # Delay execution until after all arguments are parsed
-        # to account for later options (specifically --verbose).
-        after = -> {
-          print_version(STDOUT, Log.level <= ::Log::Severity::Info)
-          exit 0
-        }
-      end
-
-      p.unknown_args do |args|
-        positional_args = args
-      end
-
-      p.invalid_option do |opt|
-        Log.error { "invalid option: #{opt}" }
-        exit 2
+  def self.search_topics(document, topics : Array)
+    topics.each do |topic|
+      search_topic document, topic do |topic, content|
+        yield topic, content
       end
     end
-
-    parser.parse(args)
-    after.try &.call
-    {positional_args, config}
   end
 
-  private def help(io, parser)
-    io << parser
-    io << "\n"
-  end
-
-  private def split_positional_args(args, search_path)
-    if args.size > 1
-      search_path |= [] of Path
-      area = parse_area?(args[0], search_path)
-    end
-    topics = area ? args[1..] : args
-    {area, topics}
-  end
-
-  private def parse_area?(str : String, search_path) : Area?
-    Log.info { "Parsing area..." }
-    if str.includes?('/')
-      area = [Path.new(str)]
+  def self.each_file(area : Area?, config = Config.new)
+    if area
+      Log.info { "Area given, processing only matching files" }
+      area.each do |path|
+        yield path
+      end
     else
-      matching = [] of Path
-      str = str.downcase
-      Log.info { "Searching files matching '#{str}'" }
-      search_path.each do |dir|
-        unless File.directory? dir
-          Log.debug { "#{dir} does not exist" }
-          next
-        end
-        Log.debug { "Searching in #{dir}" }
-        Cheet.each_file_recursive(dir) do |path|
-          Log.debug { "Trying #{path}" }
-          if path.basename.downcase.includes? str
-            Log.debug { "Found #{path}" }
-            matching << path
-          end
-        end
+      Log.info { "No area given, processing all files in path" }
+      each_file_recursive config.search_path do |path|
+        Log.trace { "Processing #{path}" }
+        yield path
       end
-      area = matching unless matching.empty?
     end
-    Log.info { "Area is #{area ? area.join(", ") : "nil"}" }
-    area
   end
 
-  def main(args = ARGV)
-    posargs, config_args = parse_args(args)
-    config_env = Config.from_env
-    Log.debug { "Merging configuration from arguments and environment" }
-    config = Config.layer(config_args, config_env)
-    Log.debug { "Path is #{config.search_path.map(&.to_s).join(":")}" }
-    area, topics = split_positional_args(posargs, config.search_path)
-    count = Cheet.run(area, topics, config)
-    exit 1 if count == 0
+  def self.run(area : Area?, topics : Array(Topic), config = Config.new)
+    matches_count = 0
+    each_file(area, config) do |path|
+      if File.exists? path
+        Log.info { "Searching file #{path}..." }
+        doc = load_document(path)
+        first_topic = true
+        search_topics doc, topics do |topic, content|
+          config.stdout << "\n" unless matches_count == 0
+          if first_topic
+            print_header doc, config.stdout, color: config.header_color
+            first_topic = false
+          end
+          print_content content, config.stdout
+          matches_count += 1
+        end
+      end
+    end
+    matches_count
   end
 end
-
-Log.define_formatter Fmt, "#{source}: #{message}"
-Log.setup "cheet", :notice,
-    Log::IOBackend.new(STDERR, formatter: Fmt, dispatcher: :sync)
-Cheet::Cli.main
