@@ -1,5 +1,5 @@
 require "spec"
-require "../src/markdown"
+require "../src/cheet/markdown"
 
 include Cheet::Markdown
 

@@ -1,5 +1,5 @@
 require "spec"
-require "../src/index"
+require "../src/cheet/index"
 
 lorem_index = Cheet::Index.new
 lorem_index << Cheet::Heading.new "The Document", 1, 0         # [0]

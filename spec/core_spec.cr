@@ -1,5 +1,5 @@
 require "spec"
-require "../src/core"
+require "../src/cheet/core"
 
 include Cheet
 
@@ -31,8 +31,8 @@ describe Cheet do
       paths.should contain "spec/files/lorem.md"
       paths.should contain "spec/core_spec.cr"
       paths.should contain "spec/markdown_spec.cr"
-      paths.should contain "src/core.cr"
-      paths.should contain "src/markdown.cr"
+      paths.should contain "src/cheet/core.cr"
+      paths.should contain "src/cheet/markdown.cr"
     end
   end
 
@@ -47,8 +47,8 @@ describe Cheet do
       paths.should contain "spec/files/lorem.md"
       paths.should contain "spec/core_spec.cr"
       paths.should contain "spec/markdown_spec.cr"
-      paths.should_not contain "src/core.cr"
-      paths.should_not contain "src/markdown.cr"
+      paths.should_not contain "src/cheet/core.cr"
+      paths.should_not contain "src/cheet/markdown.cr"
     end
 
     it "accepts array argument" do
@@ -61,8 +61,8 @@ describe Cheet do
       paths.should contain "spec/files/lorem.md"
       paths.should contain "spec/core_spec.cr"
       paths.should contain "spec/markdown_spec.cr"
-      paths.should contain "src/core.cr"
-      paths.should contain "src/markdown.cr"
+      paths.should contain "src/cheet/core.cr"
+      paths.should contain "src/cheet/markdown.cr"
     end
   end
 

@@ -1,5 +1,5 @@
 require "spec"
-require "../src/parsing"
+require "../src/cheet/parsing"
 
 describe ".consists_only_of" do
   it "returns true if string consists entirely of *char*" do

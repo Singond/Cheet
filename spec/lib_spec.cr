@@ -1,5 +1,5 @@
 require "spec"
-require "../src/lib"
+require "../src/cheet"
 
 include Cheet
 

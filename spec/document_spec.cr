@@ -1,5 +1,5 @@
 require "spec"
-require "../src/document"
+require "../src/cheet/document"
 
 class TestDocument < Cheet::Document
 
