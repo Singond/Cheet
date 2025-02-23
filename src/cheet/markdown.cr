@@ -1,7 +1,10 @@
+require "poor/markdown"
 require "./core"
 require "./document"
 require "./parsing"
 require "./two_line_iterator"
+
+include Poor
 
 module Cheet::Markdown
 
@@ -29,6 +32,16 @@ module Cheet::Markdown
         # Skip underline
         @file.gets
       end
+    end
+
+    def parse(io : IO) : Poor::Markup
+      builder = Poor::Builder.new
+      parse(io, builder)
+      builder.get
+    end
+
+    def parse(io : IO, builder : Poor::Builder | Poor::Stream)
+      Poor::Markdown.parse(io, builder)
     end
   end
 end

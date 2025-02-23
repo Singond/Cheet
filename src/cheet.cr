@@ -58,24 +58,47 @@ module Cheet
     end
   end
 
-  def self.run(area : Area?, topics : Array(Topic), config = Config.new)
-    matches_count = 0
+  def self.style(config : Config)
+    style = Poor::TerminalStyle.new
+    style.line_width = 80
+    style
+  end
+
+  # Searches *topics* in *area* and yields it to the block.
+  #
+  # The arguments passed to the block are the topic and its content.
+  def self.search(area : Area?, topics : Array(Topic), config = Config.new)
+    file_idx = 0
     each_file(area, config) do |path|
       if File.exists? path
         Log.info { "Searching file #{path}..." }
         doc = load_document(path)
-        first_topic = true
+        topic_idx = 0
         search_topics doc, topics do |topic, content|
-          config.stdout << "\n" unless matches_count == 0
-          if first_topic
-            print_header doc, config.stdout, color: config.header_color
-            first_topic = false
-          end
-          print_content content, config.stdout
-          matches_count += 1
+          yield topic, content, doc, file_idx, topic_idx
+          topic_idx += 1
         end
       end
+      file_idx += 1
     end
-    matches_count
+    file_idx
+  end
+
+  def self.search_print(area : Area?, topics : Array(Topic), config = Config.new)
+    search(area, topics, config) do |topic, content, doc, file_idx, topic_idx|
+        if topic_idx == 0
+          config.stdout << '\n' if file_idx > 0
+          print_header doc, config.stdout, color: config.header_color
+        else
+          config.stdout << '\n'
+        end
+        formatter = Poor::TerminalFormatter.new(style(config), config.stdout)
+        doc.parse(content, Poor::Stream.new(formatter))
+        config.stdout << '\n'
+    end
+  end
+
+  def self.run(area, topics, config)
+    search_print(area, topics, config)
   end
 end

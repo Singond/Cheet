@@ -8,6 +8,12 @@ license: Apache-2.0
 repository: "https://github.com/Singond/Cheet.git"
 
 crystal: ">= 1.0, < 2.0"
+
+dependencies:
+  poor:
+    github: singond/crystal-poor
+    version: "~> 0.4"
+
 targets:
   cheet:
     main: src/cli.cr

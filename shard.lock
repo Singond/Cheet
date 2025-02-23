@@ -1,0 +1,6 @@
+version: 2.0
+shards:
+  poor:
+    git: https://github.com/singond/crystal-poor.git
+    version: 0.4.0
+

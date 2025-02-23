@@ -1,3 +1,4 @@
+require "poor"
 require "./index"
 
 abstract class Cheet::Document
@@ -16,6 +17,12 @@ abstract class Cheet::Document
   #
   # This method should not be called by clients directly.
   abstract def skip_to_content(heading : Heading)
+
+  # Parses the content of *io* as rich text.
+  abstract def parse(io : IO) : Poor::Markup
+
+  # Parses the content of *io* into *builder*.
+  abstract def parse(io : IO, builder : Poor::Builder | Poor::Stream)
 
   def name
     @name
