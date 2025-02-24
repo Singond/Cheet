@@ -81,6 +81,7 @@ module Cheet
       end
       file_idx += 1
     end
+    # TODO: Fix return value: Return total number of matches
     file_idx
   end
 
