@@ -84,7 +84,7 @@ module Cheet::Cli
           Log.debug { "#{dir} does not exist" }
           next
         end
-        Log.debug { "Searching in #{dir}" }
+        Log.debug { "Searching in #{dir}..." }
         Cheet.each_file_recursive(dir) do |path|
           Log.debug { "Trying #{path}" }
           if path.basename.downcase.includes? str
