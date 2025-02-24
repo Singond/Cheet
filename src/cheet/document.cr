@@ -66,14 +66,12 @@ abstract class Cheet::Document
     end
   end
 
-  # Returns the content of the first heading for which the given block
-  # is truthy.
-  def content? : IO?
-    heading_index = index.index do |heading|
-      yield heading
-    end
-    heading_index.try do |idx|
-      content?(idx)
-    end
+  # Returns an iterator that returns the contents of each heading
+  # for which the given block is truthy.
+  def content?(&func : Heading -> U) forall U
+    index.each_with_index
+      .select { |heading, heading_index| func.call(heading) }
+      .map { |heading, heading_index| content?(heading_index) }
+      .reject Nil
   end
 end

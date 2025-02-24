@@ -30,7 +30,7 @@ module Cheet
 
   def self.search_topic(document, topic : Topic)
     Log.debug { "Searching topic '#{topic}' in #{document.name}" }
-    document.content?(&.matches? topic).try do |content|
+    document.content?(&.matches? topic).each do |content|
       yield topic, content
     end
   end
@@ -92,6 +92,7 @@ module Cheet
         else
           config.stdout << '\n'
         end
+        # TODO: Print topic heading (at least if more than one)
         formatter = Poor::TerminalFormatter.new(style(config), config.stdout)
         doc.parse(content, Poor::Stream.new(formatter))
         config.stdout << '\n'
