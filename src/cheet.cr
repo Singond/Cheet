@@ -61,6 +61,8 @@ module Cheet
   def self.style(config : Config)
     style = Poor::TerminalStyle.new
     style.line_width = 80
+    style.left_margin = 4
+    style.right_margin = 4
     style
   end
 
