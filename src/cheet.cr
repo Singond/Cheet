@@ -63,6 +63,7 @@ module Cheet
     style.line_width = 80
     style.left_margin = 4
     style.right_margin = 4
+    style.code_style = Colorize.with.dim
     style
   end
 
