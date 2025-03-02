@@ -28,9 +28,16 @@ abstract class Cheet::Document
     @name
   end
 
+  private def ensure_numbered_index(idx : Index)
+    if idx[0]?.try(&.index.nil?)
+      idx.number_headings
+    end
+  end
+
   def index : Index
     unless idx = @index
       idx = build_index
+      ensure_numbered_index(idx)
       @index = idx
     end
     idx.not_nil!
@@ -39,20 +46,25 @@ abstract class Cheet::Document
   # Returns the content of the heading given by its index.
   #
   # Returns nil if *heading_index* is out of bounds.
+  #
   # If *include heading* is true, the heading itself is included
   # in the returned value, otherwise it is skipped.
   # The default value is `false`.
   def content?(heading_index : Int32, include_heading = false) : IO?
-    heading = index[heading_index]?
-    heading ? content_by_index(heading, heading_index, include_heading) : nil
+    index[heading_index]?.try do |heading|
+      content(heading, include_heading: include_heading)
+    end
   end
 
-  # Returns the content of *heading*.
+  # Returns the content of section beginning with *heading*.
   #
   # If given, *heading_index* should be the index of *heading*
   # in this document's index.
-  protected def content_by_index(heading : Heading, heading_index = nil,
-      include_heading = false) : IO
+  #
+  # Raises if *heading* is not present in the index, or not at the position
+  # given by *heading_index*.
+  protected def content_by_index(heading : Heading,
+      heading_index = heading.index, include_heading = false) : IO
     if !heading_index
       heading_index = index.index!(heading)
     elsif heading != index[heading_index]

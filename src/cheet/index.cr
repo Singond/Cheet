@@ -21,6 +21,12 @@ class Cheet::Index
     io << @headings
   end
 
+  def number_headings
+    @headings = @headings.map_with_index! do |heading, heading_index|
+      Heading.new(heading, heading_index)
+    end
+  end
+
   def next_at_level(start : Int32, level = level_of(start)) : Heading?
     headings.each
         .skip(start + 1)

@@ -1,9 +1,15 @@
-class Cheet::Heading
+struct Cheet::Heading
   getter value : String
   getter level : UInt8
   getter offset : UInt64
+  # Returns the numeric index into the associated Index object.
+  getter index : Int32?
 
-  def initialize(@value, @level, @offset)
+  def initialize(@value, @level, @offset, @index = nil)
+  end
+
+  def initialize(heading : Heading, index)
+    initialize(heading.value, heading.level, heading.offset, index)
   end
 
   def to_s(io : IO)
