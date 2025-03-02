@@ -9,6 +9,47 @@ module Cheet
     Markdown::MarkdownDocument.new path
   end
 
+  struct Match
+    getter document : Document
+    getter topic : Topic
+    getter heading : Heading
+
+    def initialize(@document, @topic, @heading)
+    end
+
+    def content : IO
+      document.content(heading, include_heading: true)
+    end
+
+    def parse_content(builder)
+      document.parse(content, builder)
+    end
+  end
+
+  # Searches *topics* in *area* and yields matches to the block.
+  def self.search(area : Area?, topics : Array(Topic), config = Config.new)
+    each_file(area, config) do |path|
+      if File.exists? path
+        Log.info { "Searching file #{path}..." }
+        doc = load_document(path)
+        topics.each do |topic|
+          doc.select_headings(&.matches? topic).each do |heading|
+            yield Match.new(doc, topic, heading)
+          end
+        end
+      end
+    end
+  end
+
+  # Searches *topics* in *area* and returns an array of the matches.
+  def self.search(area : Area?, topics : Array(Topic), config = Config.new)
+    matches = [] of Match
+    search(area, topics, config) do |match|
+      matches << match
+    end
+    matches
+  end
+
   def self.print_header(document, output = STDOUT, color = :default)
     Colorize.with.fore(color).surround(output) do
       output << document.name << ":"
@@ -26,21 +67,6 @@ module Cheet
       # skip
     end
     output << c if c
-  end
-
-  def self.search_topic(document, topic : Topic)
-    Log.debug { "Searching topic '#{topic}' in #{document.name}" }
-    document.content?(&.matches? topic).each do |content|
-      yield topic, content
-    end
-  end
-
-  def self.search_topics(document, topics : Array)
-    topics.each do |topic|
-      search_topic document, topic do |topic, content|
-        yield topic, content
-      end
-    end
   end
 
   def self.each_file(area : Area?, config = Config.new)
@@ -67,43 +93,21 @@ module Cheet
     style
   end
 
-  # Searches *topics* in *area* and yields it to the block.
+  # Searches for *topics* in *area* and prints matching sections.
   #
-  # The arguments passed to the block are the topic and its content.
-  def self.search(area : Area?, topics : Array(Topic), config = Config.new)
-    file_idx = 0
-    each_file(area, config) do |path|
-      if File.exists? path
-        Log.info { "Searching file #{path}..." }
-        doc = load_document(path)
-        topic_idx = 0
-        search_topics doc, topics do |topic, content|
-          yield topic, content, doc, file_idx, topic_idx
-          topic_idx += 1
-        end
-      end
-      file_idx += 1
-    end
-    # TODO: Fix return value: Return total number of matches
-    file_idx
-  end
-
+  # Returns the number of matches.
   def self.search_print(area : Area?, topics : Array(Topic), config = Config.new)
-    search(area, topics, config) do |topic, content, doc, file_idx, topic_idx|
-        if topic_idx == 0
-          config.stdout << '\n' if file_idx > 0
-          print_header doc, config.stdout, color: config.header_color
-        else
-          config.stdout << '\n'
-        end
-        # TODO: Print topic heading (at least if more than one)
-        formatter = Poor::TerminalFormatter.new(style(config), config.stdout)
-        doc.parse(content, Poor::Stream.new(formatter))
-        config.stdout << '\n'
+    matches = search(area, topics, config)
+    matches.each do |match|
+      print_header(match.document, config.stdout, color: config.header_color)
+      formatter = Poor::TerminalFormatter.new(style(config), config.stdout)
+      match.parse_content(Poor::Stream.new(formatter))
+      config.stdout << '\n'
     end
+    matches.size
   end
 
-  def self.run(area, topics, config)
+  def self.run(area, topics, config) : Int32
     search_print(area, topics, config)
   end
 end

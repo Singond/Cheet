@@ -16,7 +16,7 @@ abstract class Cheet::Document
   # *heading*.
   #
   # This method should not be called by clients directly.
-  abstract def skip_to_content(heading : Heading)
+  abstract def skip_to_content(heading : Heading, *, skip_heading = true)
 
   # Parses the content of *io* as rich text.
   abstract def parse(io : IO) : Poor::Markup
@@ -43,7 +43,25 @@ abstract class Cheet::Document
     idx.not_nil!
   end
 
-  # Returns the content of the heading given by its index.
+  # Returns an iterator that returns each heading for which the given
+  # block is truthy.
+  def select_headings(&func : Heading -> U) : Iterator(Heading) forall U
+    index.each.select { |heading| func.call(heading) }
+  end
+
+  # Returns the content of section beginning with *heading*.
+  #
+  # Raises if *heading* is not present in the index, or if its internal
+  # index is inconsistent with its position in document index.
+  #
+  # If *include heading* is true, the heading itself is included
+  # in the returned value, otherwise it is skipped.
+  # The default value is `false`.
+  def content(heading : Heading, include_heading = false) : IO
+    content_by_index(heading, include_heading: include_heading)
+  end
+
+  # Returns the content of section beginning with *heading_index*th heading.
   #
   # Returns nil if *heading_index* is out of bounds.
   #
@@ -80,14 +98,5 @@ abstract class Cheet::Document
       # Read to end
       @file
     end
-  end
-
-  # Returns an iterator that returns the contents of each heading
-  # for which the given block is truthy.
-  def content?(&func : Heading -> U) forall U
-    index.each_with_index
-      .select { |heading, heading_index| func.call(heading) }
-      .map { |heading, heading_index| content?(heading_index) }
-      .reject Nil
   end
 end

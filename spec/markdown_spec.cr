@@ -65,6 +65,15 @@ describe MarkdownDocument do
     end
   end
 
+  describe "#select_headings?(&block)" do
+    it "retrieves all matching headings" do
+      d = MarkdownDocument.new("spec/files/lorem.md")
+      headings = (d.select_headings &.value.includes?("lectus")).to_a
+      headings.size.should eq 1
+      headings[0].should eq Cheet::Heading.new("Sed vel lectus", 2, 177, 1)
+    end
+  end
+
   describe "#content?(Int32)" do
     it "retrieves the content including subsections" do
       d = MarkdownDocument.new("spec/files/lorem.md")
@@ -112,10 +121,11 @@ describe MarkdownDocument do
     end
   end
 
-  describe "#content?(&block)" do
-    it "retrieves the content under the first matching heading" do
+  describe "#content(Heading)" do
+    it "retrieves the content of section" do
       d = MarkdownDocument.new("spec/files/lorem.md")
-      content = (d.content? &.value.includes?("lectus")).try &.gets_to_end
+      heading = Cheet::Heading.new("Sed vel lectus", 2, 177, 1)
+      content = d.content(heading).gets_to_end
 
       content.should_not be_nil
       content = content.not_nil!

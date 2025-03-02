@@ -12,7 +12,14 @@ class TestDocument < Cheet::Document
     @index.not_nil!
   end
 
-  def skip_to_content(heading)
+  def skip_to_content(heading, *, skip_heading = true)
+  end
+
+  def parse(io : IO) : Poor::Markup
+    Poor::Markup.markup()
+  end
+
+  def parse(io : IO, builder : Poor::Builder | Poor::Stream)
   end
 
   def public_content_by_index(*args)
@@ -34,7 +41,16 @@ def loremdoc
 end
 
 describe Cheet::Document do
-  describe "#content(heading)?" do
+  describe "#content?(Heading)" do
+    it "raises if the heading is not present" do
+      bad_heading = Cheet::Heading.new("Nonexistent", 1, 500)
+      expect_raises(Exception) do
+        loremdoc.content(bad_heading).should be_nil
+      end
+    end
+  end
+
+  describe "#content?(Int32)" do
     it "returns nil if the heading is out of bounds" do
       loremdoc.content?(12).should be_nil
     end
