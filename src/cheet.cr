@@ -52,9 +52,13 @@ module Cheet
 
   def self.print_header(document, output = STDOUT, color = :default)
     Colorize.with.fore(color).surround(output) do
-      output << document.name << ":"
+      output << document.name << ':'
     end
-    output << "\n"
+    output << '\n'
+  end
+
+  def self.print_same_file_separator(output = STDOUT, color = :default)
+    output << '\n'
   end
 
   def self.print_content(content, output = STDOUT)
@@ -98,11 +102,17 @@ module Cheet
   # Returns the number of matches.
   def self.search_print(area : Area?, topics : Array(Topic), config = Config.new)
     matches = search(area, topics, config)
+    last_document : Document? = nil
     matches.each do |match|
-      print_header(match.document, config.stdout, color: config.header_color)
+      unless match.document == last_document
+        print_header(match.document, config.stdout, color: config.header_color)
+      else
+        print_same_file_separator(config.stdout, color: config.header_color)
+      end
       formatter = Poor::TerminalFormatter.new(style(config), config.stdout)
       match.parse_content(Poor::Stream.new(formatter))
       config.stdout << '\n'
+      last_document = match.document
     end
     matches.size
   end
