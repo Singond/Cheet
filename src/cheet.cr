@@ -17,12 +17,12 @@ module Cheet
     def initialize(@document, @topic, @heading)
     end
 
-    def content : IO
-      document.content(heading, include_heading: true)
+    def content(**opts) : IO
+      document.content(heading, **opts)
     end
 
-    def parse_content(builder)
-      document.parse(content, builder)
+    def parse_content(builder, **opts)
+      document.parse(content(**opts), builder)
     end
   end
 
