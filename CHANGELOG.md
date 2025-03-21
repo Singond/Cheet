@@ -1,8 +1,8 @@
 Changelog
 =========
 
-[Unreleased]
-------------
+[0.2.0] - 2025-03-21
+--------------------
 ### Added
 - This changelog.
 - Enabled printing multiple matches within one file.
