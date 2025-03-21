@@ -64,6 +64,11 @@ module Cheet
   end
 
   def self.print_same_file_separator(output = STDOUT, color = :default)
+    Colorize.with.fore(color).surround(output) do
+      8.times do
+        output << '-'
+      end
+    end
     output << '\n'
   end
 
