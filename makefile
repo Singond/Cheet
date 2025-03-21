@@ -1,7 +1,7 @@
 PREFIX ?= /usr/local
 all_files != git ls-files
 src_files != find src -type f
-installables = cheet
+installables = bin/cheet
 version != grep "version:" shard.yml | cut -d " " -f2
 revision != git rev-parse HEAD 2> /dev/null
 distbase = cheet-$(version)
@@ -9,9 +9,9 @@ distfile = $(distbase).tar.gz
 
 all: $(installables)
 
-cheet: $(src_files)
+bin/cheet: $(src_files)
 	env CHEET_GIT_COMMIT=$(revision) \
-		crystal build --release src/cheet.cr
+		shards build --release
 
 .PHONY: check
 check: $(src_files)
@@ -21,7 +21,7 @@ check: $(src_files)
 install: $(installables)
 	@echo "Installing $(DESTDIR)$(PREFIX)/bin/cheet"
 	install -d $(DESTDIR)$(PREFIX)/bin/
-	install -m 755 cheet $(DESTDIR)$(PREFIX)/bin/
+	install -m 755 bin/cheet $(DESTDIR)$(PREFIX)/bin/
 	install -d $(DESTDIR)$(PREFIX)/share/man/man1/
 	install -m 644 doc/cheet.1 $(DESTDIR)$(PREFIX)/share/man/man1/
 

@@ -1,6 +1,11 @@
 Changelog
 =========
 
+[Unreleased]
+------------
+### Fixed
+- Binary producing no output when built with `make`.
+
 [0.2.0] - 2025-03-21
 --------------------
 ### Added
