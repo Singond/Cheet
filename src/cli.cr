@@ -42,6 +42,10 @@ module Cheet::Cli
         }
       end
 
+      p.on "--no-promote-headings", "Print headings at their actual level" do
+        config.promote_headings = false
+      end
+
       p.unknown_args do |args|
         positional_args = args
       end

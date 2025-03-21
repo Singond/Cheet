@@ -22,6 +22,9 @@ class TestDocument < Cheet::Document
   def parse(io : IO, builder : Poor::Builder | Poor::Stream)
   end
 
+  def parse_map(io : IO, builder : Poor::Builder | Poor::Stream, & : Markup -> Markup)
+  end
+
   def public_content_by_index(*args)
     content_by_index *args
   end

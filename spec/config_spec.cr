@@ -34,12 +34,15 @@ describe Cheet::Config do
       cfg1 = Config.new
       cfg1.stdout = STDERR
       cfg1.search_path = nil
+      cfg1.promote_headings = false
       cfg2 = Config.new
       cfg2.stdout = STDOUT
       cfg2.search_path = [Path["/home/user/"]]
+      cfg2.promote_headings = true
       layered = Config.layer(cfg1, cfg2)
       layered.stdout.should eq STDERR
       layered.search_path.should eq [Path["/home/user/"]]
+      layered.promote_headings.should eq false
     end
   end
 end

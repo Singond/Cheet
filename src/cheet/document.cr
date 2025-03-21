@@ -24,6 +24,11 @@ abstract class Cheet::Document
   # Parses the content of *io* into *builder*.
   abstract def parse(io : IO, builder : Poor::Builder | Poor::Stream)
 
+  # Parses the content of *io*, transforms it using the provided block
+  # and passes it into *builder*.
+  abstract def parse_map(io : IO, builder : Poor::Builder | Poor::Stream,
+                         & : Markup -> Markup)
+
   def name
     @name
   end

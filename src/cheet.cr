@@ -24,6 +24,12 @@ module Cheet
     def parse_content(builder, **opts)
       document.parse(content(**opts), builder)
     end
+
+    def parse_content(builder, **opts)
+      document.parse_map(content(**opts), builder) do |markup|
+        yield markup
+      end
+    end
   end
 
   # Searches *topics* in *area* and yields matches to the block.
@@ -110,7 +116,14 @@ module Cheet
         print_same_file_separator(config.stdout, color: config.header_color)
       end
       formatter = Poor::TerminalFormatter.new(style(config), config.stdout)
-      match.parse_content(Poor::Stream.new(formatter))
+      stream = Poor::Stream.new(formatter)
+      match.parse_content(stream, include_heading: true) do |markup|
+        if config.promote_headings
+          promote_headings(markup, match.heading.level - 1)
+        else
+          markup
+        end
+      end
       config.stdout << '\n'
       last_document = match.document
     end

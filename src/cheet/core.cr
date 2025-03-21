@@ -1,3 +1,5 @@
+require "poor"
+
 module Cheet
 
   VERSION = {{ `shards version #{__DIR__}`.chomp.stringify }}
@@ -79,6 +81,28 @@ module Cheet
     io << ")\n"
     if revision && (rev = REVISION) && !rev.empty?
       io << "git revision: #{REVISION}\n"
+    end
+  end
+
+  def self.promote_headings(markup : Poor::Markup)
+    top_heading = nil
+    markup.map_recursive! do |m|
+      if m.is_a? Poor::Heading
+        top_heading = m unless top_heading
+        m = Poor.heading(m.level - top_heading.not_nil!.level + 1, m.children)
+      end
+      m
+    end
+  end
+
+  def self.promote_headings(markup : Poor::Markup, levels : Int)
+    top_heading = nil
+    markup.map_recursive! do |m|
+      if m.is_a? Poor::Heading
+        top_heading = m unless top_heading
+        m = Poor.heading(m.level - levels, m.children)
+      end
+      m
     end
   end
 end

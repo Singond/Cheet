@@ -45,5 +45,13 @@ module Cheet::Markdown
     def parse(io : IO, builder : Poor::Builder | Poor::Stream)
       Poor::Markdown.parse(io, builder)
     end
+
+    def parse_map(io : IO, builder : Poor::Builder | Poor::Stream)
+      builder.start(Base.new)
+      Poor::Markdown.each_top_level_block(io) do |block|
+        builder.add(yield block)
+      end
+      builder.finish
+    end
   end
 end

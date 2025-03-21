@@ -8,6 +8,7 @@ struct Cheet::Config
     Path.home / ".cheet"]
   end
   property header_color = :blue
+  property(promote_headings) { true }
 
   def initialize
     Log.trace { "Initializing default config" }
@@ -30,6 +31,9 @@ struct Cheet::Config
           Log.error { "CHEET_PATH must be absolute" }
         end
       end
+    end
+    env["CHEET_PROMOTE_HEADINGS"]?.try do |value|
+      config.promote_headings = (value.downcase == "true")
     end
     config
   end
