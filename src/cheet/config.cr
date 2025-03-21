@@ -9,6 +9,7 @@ struct Cheet::Config
   end
   property header_color = :blue
   property(promote_headings) { true }
+  property(raw_content) { false }
 
   def initialize
     Log.trace { "Initializing default config" }
@@ -34,6 +35,9 @@ struct Cheet::Config
     end
     env["CHEET_PROMOTE_HEADINGS"]?.try do |value|
       config.promote_headings = (value.downcase == "true")
+    end
+    env["CHEET_RAW"]?.try do |value|
+      config.raw_content = (value.downcase == "true")
     end
     config
   end

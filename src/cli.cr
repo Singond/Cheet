@@ -42,6 +42,10 @@ module Cheet::Cli
         }
       end
 
+      p.on "--raw", "Print raw content without formatting" do
+        config.raw_content = true
+      end
+
       p.on "--no-promote-headings", "Print headings at their actual level" do
         config.promote_headings = false
       end

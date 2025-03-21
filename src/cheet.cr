@@ -67,9 +67,67 @@ module Cheet
     output << '\n'
   end
 
-  def self.print_content(content, output = STDOUT)
+  # Copies raw *content* into *output*.
+  def self.print_content_raw(content, output = STDOUT)
     skip_whitespace content, output
     IO.copy content, output
+  end
+
+  # Prints the raw content of single *match* to the output.
+  def self.print_content_raw(match : Match, config = Config.new)
+    print_content_raw(match.content(include_heading: true), config.stdout)
+  end
+
+  # Parses the content of single *match* and prints it formatted
+  # into the output.
+  def self.print_content_formatted(match : Match, config = Config.new)
+    formatter = Poor::TerminalFormatter.new(style(config), config.stdout)
+    stream = Poor::Stream.new(formatter)
+    match.parse_content(stream, include_heading: true) do |markup|
+      if config.promote_headings
+        promote_headings(markup, match.heading.level - 1)
+      else
+        markup
+      end
+    end
+    config.stdout << '\n'
+  end
+
+  # Prints single *match* to the output.
+  def self.print(match : Match, config = Config.new)
+    if config.raw_content
+      print_content_raw(match, config)
+    else
+      print_content_formatted(match, config)
+    end
+  end
+
+  # Prints given matches to the output.
+  def self.print(matches : Enumerable(Match), config = Config.new)
+    last_document : Document? = nil
+    matches.each do |match|
+      unless match.document == last_document
+        print_header(match.document, config.stdout, color: config.header_color)
+      else
+        print_same_file_separator(config.stdout, color: config.header_color)
+      end
+      print(match, config)
+      last_document = match.document
+    end
+  end
+
+  # Searches for *topics* in *area* and prints matching sections.
+  #
+  # Returns the number of matches.
+  def self.search_print(area : Area?, topics : Array(Topic), config = Config.new)
+    matches = search(area, topics, config)
+    last_document : Document? = nil
+    print(matches, config)
+    matches.size
+  end
+
+  def self.run(area, topics, config) : Int32
+    search_print(area, topics, config)
   end
 
   private def self.skip_whitespace(input, output)
@@ -79,7 +137,7 @@ module Cheet
     output << c if c
   end
 
-  def self.each_file(area : Area?, config = Config.new)
+  private def self.each_file(area : Area?, config = Config.new)
     if area
       Log.info { "Area given, processing only matching files" }
       area.each do |path|
@@ -94,43 +152,12 @@ module Cheet
     end
   end
 
-  def self.style(config : Config)
+  private def self.style(config : Config)
     style = Poor::TerminalStyle.new
     style.line_width = 80
     style.left_margin = 4
     style.right_margin = 4
     style.code_style = Colorize.with.dim
     style
-  end
-
-  # Searches for *topics* in *area* and prints matching sections.
-  #
-  # Returns the number of matches.
-  def self.search_print(area : Area?, topics : Array(Topic), config = Config.new)
-    matches = search(area, topics, config)
-    last_document : Document? = nil
-    matches.each do |match|
-      unless match.document == last_document
-        print_header(match.document, config.stdout, color: config.header_color)
-      else
-        print_same_file_separator(config.stdout, color: config.header_color)
-      end
-      formatter = Poor::TerminalFormatter.new(style(config), config.stdout)
-      stream = Poor::Stream.new(formatter)
-      match.parse_content(stream, include_heading: true) do |markup|
-        if config.promote_headings
-          promote_headings(markup, match.heading.level - 1)
-        else
-          markup
-        end
-      end
-      config.stdout << '\n'
-      last_document = match.document
-    end
-    matches.size
-  end
-
-  def self.run(area, topics, config) : Int32
-    search_print(area, topics, config)
   end
 end
